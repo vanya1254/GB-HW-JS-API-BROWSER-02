@@ -31,18 +31,16 @@ const prevBtn = document.querySelector(".prev");
 const nextBtn = document.querySelector(".next");
 let curImg = 0;
 
-const createImgEl = (imgData = { alt: "", src: "" }, id) => {
+((imgData = { alt: "", src: "" }, id) => {
   let imgEl = document.createElement("img");
   imgEl.dataset.id = id;
   imgEl.src = imgData.src;
   imgEl.alt = imgData.alt;
 
   imgContainerEl.appendChild(imgEl);
-};
+})(IMGS[curImg], curImg);
 
-createImgEl(IMGS[curImg], curImg);
-
-const prevBtnClick = (currentImgId) => {
+const getPrevIndex = (currentImgId) => {
   if (currentImgId - 1 >= 0) {
     return currentImgId - 1;
   } else {
@@ -50,7 +48,7 @@ const prevBtnClick = (currentImgId) => {
   }
 };
 
-const nextBtnClick = (currentImgId) => {
+const getNextIndex = (currentImgId) => {
   if (currentImgId + 1 <= IMGS.length - 1) {
     return currentImgId + 1;
   } else {
@@ -63,7 +61,7 @@ const nextBtnClick = (currentImgId) => {
 const dotsContainerEl = document.querySelector(".navigation-dots");
 
 //способ на случай если img не много
-const createDotEls = (countDots) => {
+((countDots) => {
   for (let i = 0; i < countDots; i++) {
     const navDotEl = document.createElement("span");
     navDotEl.classList.add("dot");
@@ -75,11 +73,9 @@ const createDotEls = (countDots) => {
 
     dotsContainerEl.appendChild(navDotEl);
   }
-};
+})(IMGS.length);
 
-createDotEls(IMGS.length);
-
-const dotsClick = (target) => {
+const updateDot = (target) => {
   if (!target.classList.contains("active")) {
     [...dotsContainerEl.children].forEach((dotEl) => {
       if (dotEl.classList.contains("active")) {
@@ -90,34 +86,23 @@ const dotsClick = (target) => {
     return target.dataset.id;
   }
 };
-///очень похожи не придумал, как лучше
-const updateDot = (currentImgId) => {
-  let curDotEl = dotsContainerEl.children[currentImgId];
-
-  if (!curDotEl.classList.contains("active")) {
-    [...dotsContainerEl.children].forEach((dotEl) => {
-      if (dotEl.classList.contains("active")) {
-        dotEl.classList.remove("active");
-      }
-    });
-    curDotEl.classList.add("active");
-  }
-};
 
 sliderContainerEl.addEventListener("click", ({ target }) => {
-  let curImgEl = imgContainerEl.querySelector("img");
+  const curImgEl = imgContainerEl.querySelector("img");
   curImg = Number(curImgEl.dataset.id);
 
   if (target.matches(".prev")) {
-    curImg = prevBtnClick(curImg);
-    updateDot(curImg);
+    curImg = getPrevIndex(curImg);
+    const curDotEl = dotsContainerEl.children[curImg];
+    updateDot(curDotEl);
   }
   if (target.matches(".next")) {
-    curImg = nextBtnClick(curImg);
-    updateDot(curImg);
+    curImg = getNextIndex(curImg);
+    const curDotEl = dotsContainerEl.children[curImg];
+    updateDot(curDotEl);
   }
   if (target.matches(".dot")) {
-    curImg = dotsClick(target);
+    curImg = updateDot(target);
   }
 
   const prevNextImg = IMGS[curImg];
